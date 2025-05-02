@@ -7,16 +7,16 @@ class Analysis:
     def __init__(self):
         pass
 
-    def open_close_plot(self, stock):
+    def price_plot(self, stock):
         stock_data = {}
-        stock_data['Open'] = stock.series_data['Open']
-        stock_data['Close'] = stock.series_data['Close']
-        
+        stock_data = {}
+        stock_data['Price'] = stock.series_data['Price']
+
         plt.figure(figsize=(12, 6))
         for price, series in stock_data.items():
             plt.plot(series.index, series.values, label=price)
-        
-        plt.title(f"{stock.ticker} Open and Close Price")
+
+        plt.title(f"{stock.ticker} Price")
         plt.xlabel('Date')
         plt.ylabel('Price')
         plt.legend()
@@ -24,7 +24,7 @@ class Analysis:
         plt.show()
 
     def add_log_return(self, stock):
-        price_column = 'Close' if 'Close' in stock.series_data.columns else 'Close'
+        price_column = 'Price' if 'Price' in stock.series_data.columns else 'Price'
         stock.series_data['Log_Return'] = np.log(stock.series_data[price_column] / stock.series_data[price_column].shift(1))
         log_returns = stock.series_data['Log_Return'].dropna()
         stock.min_log_return = tmin(log_returns)
