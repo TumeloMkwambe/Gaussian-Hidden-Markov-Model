@@ -11,4 +11,5 @@ sa40.preprocess()
 analysis = Analysis()
 analysis.add_log_return(sa40)
 sa40.series_data.dropna(inplace=True)
-analysis.price_plot(sa40)
+
+analysis.summary_statistics(sa40)
