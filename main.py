@@ -1,26 +1,14 @@
-from index import Index
+from data import Stock
+import pandas as pd
 from analysis import Analysis
 from hidden_markov_model import Hidden_Markov_Model
 
-'''
-ANALYSIS
-'''
-FTSE_JSE = Index('^J141.JO')
-AAnalysis = Analysis()
-AAnalysis.add_log_return(FTSE_JSE)
-AAnalysis.summary_statistics(FTSE_JSE)
-AAnalysis.open_close_plot(FTSE_JSE)
-AAnalysis.log_return_distribution(FTSE_JSE)
 
-print(FTSE_JSE.series_data)
-Dataset = FTSE_JSE.series_data['Log_Return'].dropna().to_numpy()
+sa40 = Stock('JTOPI')
+sa40.series_data = pd.read_csv('South_Africa_Top_40_Historical_Data.csv')
+sa40.preprocess()
 
-
-
-'''
-MODEL
-'''
-
-model = Hidden_Markov_Model(Dataset, 3)
-model.baum_welch_algorithm(0.001)
-model.get_parameters()
+analysis = Analysis()
+analysis.add_log_return(sa40)
+sa40.series_data.dropna(inplace=True)
+analysis.price_plot(sa40)
