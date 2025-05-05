@@ -1,5 +1,6 @@
-from scipy.stats import tmin, tmax, tmean, tvar, skew, kurtosis
+from scipy.stats import tmin, tmax, tmean, tvar, skew, kurtosis, norm
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import seaborn as sns
 import numpy as np
 
@@ -59,6 +60,35 @@ class Analysis:
         plt.xlabel(column)
         plt.ylabel('Cumulative Probability')
         plt.grid(True, alpha=0.5)
+        plt.show()
+    
+    def normal_distribution(self, x, mean_array, variance_array):
+        std_array = np.sqrt(variance_array)
+        return [norm.pdf(x, loc=mu, scale=std) for mu, std in zip(mean_array, std_array)]
+
+    def plot_distributions(self, mean_array, variance_array):
+        std_array = np.sqrt(variance_array)
+        x_min = np.min(mean_array - 4 * std_array)
+        x_max = np.max(mean_array + 4 * std_array)
+        x = np.linspace(x_min, x_max, 1000)
+
+        pdfs = self.normal_distribution(x, mean_array, variance_array)
+
+        cmap = cm.get_cmap('tab10')
+        colors = [cmap(i % 10) for i in range(len(mean_array))]
+
+        for i, pdf in enumerate(pdfs):
+            plt.plot(
+                x, pdf,
+                label=f'Dist {i+1} ($\\mu$={mean_array[i]:.6f}, $\\sigma^2$={variance_array[i]:.1e})',
+                color=colors[i]
+            )
+
+        plt.title("Comparison of Normal Distributions")
+        plt.xlabel("x")
+        plt.ylabel("Probability Density")
+        plt.legend()
+        plt.grid(True)
         plt.show()
     
     def summary_statistics(self, stock):

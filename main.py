@@ -12,4 +12,6 @@ analysis = Analysis()
 analysis.add_log_return(sa40)
 sa40.series_data.dropna(inplace=True)
 
-analysis.summary_statistics(sa40)
+model = Hidden_Markov_Model(sa40.series_data['Log_Return'].to_numpy(), 2)
+model.baum_welch_algorithm(0.005, 100)
+model.get_parameters()
