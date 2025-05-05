@@ -1,3 +1,8 @@
+'''
+TO-DO: Use Log Probabilities To Avoid Underflow During Viterbi Algorithm.
+'''
+
+
 from sklearn.preprocessing import MinMaxScaler
 from scipy.stats import norm, tmean, tvar
 import numpy as np
@@ -10,6 +15,11 @@ class State:
         self.mean = np.random.rand()
         self.variance = np.random.rand()
         self.state_occupations = np.zeros(len(Dataset))
+
+class Vit:
+    def __init__(self, observation_length):
+        self.delta = np.zeros(observation_length)
+        self.backpointer = np.zeros(observation_length)
 
 class Hidden_Markov_Model:
     def __init__(self, Dataset, number_of_states):
@@ -24,6 +34,7 @@ class Hidden_Markov_Model:
 
         self.__state_transitions = np.zeros((len(Dataset)-1, number_of_states, number_of_states))
         self.__forward_scales = np.zeros(len(Dataset))
+        self.__state_vits = np.array([Vit(len(Dataset)) for i in range(number_of_states)])
         self.__log_likelihood = 0
 
     def __normalizing(self, array, t):
@@ -140,7 +151,39 @@ class Hidden_Markov_Model:
             difference = np.abs(new_log_likelihood - previous_log_likelihood)
             print(f'Iteration {iteration} . . . Log-Likelihood = {new_log_likelihood}')
         self.__log_likelihood = new_log_likelihood
+
+    def __find_max(self, i, t):
+        max_state = None
+        max_prob = -np.inf
+        for j in range(self.number_of_states):
+            prob = self.__state_vits[j].delta[t - 1] * self.__transition_matrix[j][i]
+            if prob > max_prob:
+                max_prob = prob
+                max_state = j
+        return max_state, max_prob
+
+    def __backtrack(self, last_state):
+        state_sequence = np.zeros(len(self.Dataset), dtype=int)
+        state_sequence[len(self.Dataset) - 1] = last_state
+        for t in range(len(self.Dataset) - 2, -1, -1):
+            state_sequence[t] = self.__state_vits[state_sequence[t + 1]].backpointer[t + 1]
+        return state_sequence
+
+    def viterbi_algorithm(self):
+        for i in range(self.number_of_states):
+            self.__state_vits[i].delta[0] = self.States[i].initial_probability * norm.pdf(self.Dataset[0], loc=self.States[i].mean, scale=np.sqrt(self.States[i].variance))
+            self.__state_vits[i].backpointer[0] = -1
+
+        for t in range(1, len(self.Dataset)):
+            for i in range(self.number_of_states):
+                max_state, max_prob = self.__find_max(i, t)
+                self.__state_vits[i].delta[t] = max_prob * norm.pdf(self.Dataset[t], loc=self.States[i].mean, scale=np.sqrt(self.States[i].variance))
+                self.__state_vits[i].backpointer[t] = max_state
     
+        last_state = np.argmax([self.__state_vits[i].delta[len(self.Dataset) - 1] for i in range(self.number_of_states)])
+
+        return self.__backtrack(last_state)
+ 
     def get_parameters(self):
         for i in range(self.number_of_states):
             print(f'==================================== {i} =====================================')

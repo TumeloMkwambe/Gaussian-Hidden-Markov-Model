@@ -80,7 +80,7 @@ class Analysis:
         for i, pdf in enumerate(pdfs):
             plt.plot(
                 x, pdf,
-                label=f'Dist {i+1} ($\\mu$={mean_array[i]:.6f}, $\\sigma^2$={variance_array[i]:.1e})',
+                label=f'State {i} ($\\mu$={mean_array[i]:.6f}, $\\sigma^2$={variance_array[i]:.1e})',
                 color=colors[i]
             )
 
