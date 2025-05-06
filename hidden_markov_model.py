@@ -1,8 +1,3 @@
-'''
-TO-DO: Use Log Probabilities To Avoid Underflow During Viterbi Algorithm.
-'''
-
-
 from sklearn.preprocessing import MinMaxScaler
 from scipy.stats import norm, tmean, tvar
 import numpy as np
@@ -154,13 +149,13 @@ class Hidden_Markov_Model:
 
     def __find_max(self, i, t):
         max_state = None
-        max_prob = -np.inf
+        max_log_prob = -np.inf
         for j in range(self.number_of_states):
-            prob = self.__state_vits[j].delta[t - 1] * self.__transition_matrix[j][i]
-            if prob > max_prob:
-                max_prob = prob
+            log_prob = self.__state_vits[j].delta[t - 1] + np.log(self.__transition_matrix[j][i])
+            if log_prob > max_log_prob:
+                max_log_prob = log_prob
                 max_state = j
-        return max_state, max_prob
+        return max_state, max_log_prob
 
     def __backtrack(self, last_state):
         state_sequence = np.zeros(len(self.Dataset), dtype=int)
@@ -171,17 +166,18 @@ class Hidden_Markov_Model:
 
     def viterbi_algorithm(self):
         for i in range(self.number_of_states):
-            self.__state_vits[i].delta[0] = self.States[i].initial_probability * norm.pdf(self.Dataset[0], loc=self.States[i].mean, scale=np.sqrt(self.States[i].variance))
+            emission_log_prob = np.log(norm.pdf(self.Dataset[0], loc=self.States[i].mean, scale=np.sqrt(self.States[i].variance)))
+            self.__state_vits[i].delta[0] = np.log(self.States[i].initial_probability) + emission_log_prob
             self.__state_vits[i].backpointer[0] = -1
 
         for t in range(1, len(self.Dataset)):
             for i in range(self.number_of_states):
-                max_state, max_prob = self.__find_max(i, t)
-                self.__state_vits[i].delta[t] = max_prob * norm.pdf(self.Dataset[t], loc=self.States[i].mean, scale=np.sqrt(self.States[i].variance))
+                max_state, max_log_prob = self.__find_max(i, t)
+                emission_log_prob = np.log(norm.pdf(self.Dataset[t], loc=self.States[i].mean, scale=np.sqrt(self.States[i].variance)))
+                self.__state_vits[i].delta[t] = max_log_prob + emission_log_prob
                 self.__state_vits[i].backpointer[t] = max_state
-    
-        last_state = np.argmax([self.__state_vits[i].delta[len(self.Dataset) - 1] for i in range(self.number_of_states)])
 
+        last_state = np.argmax([self.__state_vits[i].delta[len(self.Dataset) - 1] for i in range(self.number_of_states)])
         return self.__backtrack(last_state)
  
     def get_parameters(self):
@@ -193,3 +189,10 @@ class Hidden_Markov_Model:
             print('\n')
         print(f'Transition Matrix: {self.__transition_matrix}')
         print(f'Log Likelihood: {self.__log_likelihood}')
+
+    def get_mean_variance(self):
+        means, variances = [], []
+        for i in range(self.number_of_states):
+            means.append(self.States[i].mean)
+            variances.append(self.States[i].variance)
+        return np.array(means), np.array(variances)
