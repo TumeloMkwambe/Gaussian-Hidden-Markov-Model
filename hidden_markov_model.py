@@ -1,5 +1,4 @@
-from sklearn.preprocessing import MinMaxScaler
-from scipy.stats import norm, tmean, tvar
+from scipy.stats import norm
 import numpy as np
 
 class State:
