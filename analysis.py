@@ -13,7 +13,7 @@ class Analysis:
         stock_data = stock.series_data[[column, 'Date']]
 
         plt.figure(figsize=(12, 6))
-        plt.plot(stock_data['Date'], stock_data[column], label=column)
+        plt.plot(stock_data['Date'], stock_data[column], label=column, color='Green')
 
         plt.title(f"{stock.ticker} {column}")
         plt.xlabel('Date')
