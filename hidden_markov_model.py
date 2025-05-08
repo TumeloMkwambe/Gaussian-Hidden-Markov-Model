@@ -1,5 +1,6 @@
 from scipy.stats import norm
 import numpy as np
+import pickle
 
 class State:
     def __init__(self, Dataset):
@@ -195,3 +196,17 @@ class Hidden_Markov_Model:
             means.append(self.States[i].mean)
             variances.append(self.States[i].variance)
         return np.array(means), np.array(variances)
+
+    def save_model(self, model_name):
+        model_parameters = {
+            'initial_probabilites': [self.States[i].initial_probability for i in range(self.number_of_states)],
+            'transition_matrix': self.__transition_matrix,
+            'state_means': [self.States[i].mean for i in range(self.number_of_states)],
+            'state_variances': [self.States[i].variance for i in range(self.number_of_states)]
+        }
+
+        filename = f'{model_name}.pkl'
+        with open(filename, 'wb') as f:
+            pickle.dump(model_parameters, f)
+
+        print(f"HMM parameters saved to '{filename}'")
