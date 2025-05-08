@@ -1,8 +1,9 @@
-from scipy.stats import tmin, tmax, tmean, tvar, skew, kurtosis, norm
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import seaborn as sns
 import numpy as np
+import seaborn as sns
+import matplotlib.cm as cm
+from scipy.stats import  norm
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 class Analysis:
     def __init__(self):
@@ -29,21 +30,11 @@ class Analysis:
         plt.plot(stock.series_data['Date'], stock.series_data[column], label='Original')
         plt.plot(stock.series_data['Date'], rolling_mean, label='Rolling Mean')
         plt.plot(stock.series_data['Date'], rolling_std, label='Rolling Std')
+        plt.xlabel("Date")
+        plt.ylabel(column)
         plt.legend()
         plt.title(f"Rolling Mean & Std Deviation of {column}")
         plt.show()
-
-    def add_log_return(self, stock):
-        price_column = 'Price' if 'Price' in stock.series_data.columns else 'Price'
-        stock.series_data['Return'] = stock.series_data[price_column] / stock.series_data[price_column].shift(1)
-        stock.series_data['Log_Return'] = np.log(stock.series_data[price_column] / stock.series_data[price_column].shift(1))
-        log_returns = stock.series_data['Log_Return'].dropna()
-        stock.min_log_return = tmin(log_returns)
-        stock.max_log_return = tmax(log_returns)
-        stock.mean_log_return = tmean(log_returns)
-        stock.variance_log_return = tvar(log_returns)
-        stock.skewness_log_return = skew(log_returns)
-        stock.kurtosis_log_return = kurtosis(log_returns)
 
     def distribution(self, stock, column):
         plt.figure(figsize=(10, 6))
@@ -91,6 +82,56 @@ class Analysis:
         plt.grid(True)
         plt.show()
     
+    def mean_variance_plot(self, mean_array, variance_array):
+        cmap = cm.get_cmap('tab10')
+        colors = [cmap(i % 10) for i in range(len(mean_array))]
+
+        plt.figure(figsize=(8, 6))
+        plt.scatter(mean_array, variance_array, c=colors, s=100, edgecolors='black')
+
+        for i, (mu, var) in enumerate(zip(mean_array, variance_array)):
+            plt.text(mu, var, f'State {i}', fontsize=9, ha='right', va='bottom')
+
+        plt.title("Means vs Variances of Hidden States")
+        plt.xlabel("Mean ($\\mu$)")
+        plt.ylabel("Variance ($\\sigma^2$)")
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
+    def states_plot_points(self, stock, column, state_sequence):
+        stock_data = stock.series_data[[column, 'Date']].copy()
+        stock_data = stock_data.reset_index(drop=True)
+
+        if len(stock_data) != len(state_sequence):
+            raise ValueError("The length of the stock data and the state sequence must be the same.")
+
+        fig, ax = plt.subplots(figsize=(12, 6))
+
+        cmap = cm.get_cmap('tab10')
+        unique_states = np.unique(state_sequence)
+        colors = {state: cmap(i % 10) for i, state in enumerate(unique_states)}
+        legend_handles = {}
+
+        for i in range(len(stock_data)):
+            date = stock_data['Date'][i]
+            value = stock_data[column][i]
+            state = state_sequence[i]
+            color = colors[state]
+            ax.scatter(date, value, color=color, s=20, label=f"State {state}" if state not in legend_handles else "")
+            if state not in legend_handles:
+                legend_handles[state] = True
+
+        ax.set_title(f"{stock.ticker} {column} with Hidden States")
+        ax.set_xlabel("Date")
+        ax.set_ylabel(column)
+        ax.legend(title="States")
+        ax.grid(True)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        fig.autofmt_xdate()
+        fig.tight_layout()
+        plt.show()
+
     def summary_statistics(self, stock):
         print(f"Minimum of Log Return: {stock.min_log_return}")
         print(f"Maximum of Log Return: {stock.max_log_return}")
