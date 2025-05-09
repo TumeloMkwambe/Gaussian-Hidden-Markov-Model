@@ -75,8 +75,5 @@ This project demonstrates how **Gaussian Hidden Markov Models** can effectively 
 
 ---
 
-## References
-
-- Rabiner, L. R. (1989). A tutorial on Hidden Markov Models and selected applications in speech recognition.
-- [Investing.com](https://www.investing.com)
-- Various sources on time series analysis, volatility, and market sentiment.
+## Extras
+**Full project report under repository as report.pdf**
