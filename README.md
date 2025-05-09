@@ -76,4 +76,4 @@ This project demonstrates how **Gaussian Hidden Markov Models** can effectively 
 ---
 
 ## Extras
-**Full project report under repository as report.pdf**
+**Full project report under repository (./report.pdf)**
