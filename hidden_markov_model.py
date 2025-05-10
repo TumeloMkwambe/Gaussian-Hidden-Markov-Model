@@ -189,6 +189,8 @@ class Hidden_Markov_Model:
             print('\n')
         print(f'Transition Matrix: {self.__transition_matrix}')
         print(f'Log Likelihood: {self.__log_likelihood}')
+        print(f'Akaike Information Criterion: {self.AIC()}')
+        print(f'Bayesian Information Criterion: {self.BIC()}')
 
     def get_mean_variance(self):
         means, variances = [], []
@@ -210,3 +212,11 @@ class Hidden_Markov_Model:
             pickle.dump(model_parameters, f)
 
         print(f"HMM parameters saved to '{filename}'")
+    
+    def AIC(self):
+        number_of_parameters = (self.number_of_states * (self.number_of_states - 1)) + (2 * self.number_of_states) + (self.number_of_states - 1)
+        return 2 * number_of_parameters - 2 * np.log(self.__log_likelihood)
+
+    def BIC(self):
+        number_of_parameters = (self.number_of_states * (self.number_of_states - 1)) + (2 * self.number_of_states) + (self.number_of_states - 1)
+        return number_of_parameters * np.log(len(self.Dataset)) - 2 * np.log(self.__log_likelihood)
