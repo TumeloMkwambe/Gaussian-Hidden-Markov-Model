@@ -3,6 +3,7 @@
 **Author:** Tumelo Tshwanelo Mkwambe  
 **Institution:** School of Computer Science and Applied Mathematics, University of the Witwatersrand, Johannesburg, South Africa  
 **Email:** 2446873@students.wits.ac.za
+[Full project report](/report.pdf)
 
 ## Abstract
 
@@ -86,6 +87,3 @@ This project demonstrates how **Gaussian Hidden Markov Models** can effectively 
 - Better **risk management** and **investment decision-making**
 
 ---
-
-## Extras
-**Full project report under repository (./report.pdf)**
