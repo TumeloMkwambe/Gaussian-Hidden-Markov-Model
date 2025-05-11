@@ -2,7 +2,7 @@
 
 **Author:** Tumelo Tshwanelo Mkwambe  
 **Institution:** School of Computer Science and Applied Mathematics, University of the Witwatersrand, Johannesburg, South Africa  
-**Email:** 2446873@students.wits.ac.za
+**Email:** 2446873@students.wits.ac.za  
 **Full Report:** [Full project report](/report.pdf)
 
 ## Abstract
