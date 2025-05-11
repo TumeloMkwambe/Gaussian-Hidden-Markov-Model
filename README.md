@@ -67,7 +67,19 @@ A **Hidden Markov Model (HMM)** consists of:
 
 ---
 
-## 5. Conclusion
+## 5. Python Libraries
+`numpy`
+`pandas`
+`scipy.stats`
+`matplotlib.pyplot`
+`matplotlib.dates`
+`matplotlib.cm`
+`seaborn`
+`pickle`
+
+---
+
+## 6. Conclusion
 
 This project demonstrates how **Gaussian Hidden Markov Models** can effectively capture and characterize market regimes. The approach enables:
 - Detection of **underlying state transitions**
