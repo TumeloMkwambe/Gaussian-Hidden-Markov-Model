@@ -22,7 +22,7 @@ class Hidden_Markov_Model:
         self.Dataset = Dataset
         self.States = np.array([State(Dataset) for i in range(number_of_states)])
         self.__transition_matrix = np.random.rand(number_of_states, number_of_states)
-        self.__transition_matrix = self.__transition_matrix / np.sum(self.__transition_matrix, axis=1, keepdims=True)
+        self.__transition_matrix = self.__transition_matrix / np.sum(self.__transition_matrix, axis=1, keepdims=True) # transition matrix is row stochastic
         initial_probabilities = np.array([state.initial_probability for state in self.States])
         for state in self.States:
             state.initial_probability /= np.sum(initial_probabilities)
@@ -215,8 +215,8 @@ class Hidden_Markov_Model:
     
     def AIC(self):
         number_of_parameters = (self.number_of_states * (self.number_of_states - 1)) + (2 * self.number_of_states) + (self.number_of_states - 1)
-        return 2 * number_of_parameters - 2 * np.log(self.__log_likelihood)
+        return 2 * number_of_parameters - 2 * self.__log_likelihood
 
     def BIC(self):
         number_of_parameters = (self.number_of_states * (self.number_of_states - 1)) + (2 * self.number_of_states) + (self.number_of_states - 1)
-        return number_of_parameters * np.log(len(self.Dataset)) - 2 * np.log(self.__log_likelihood)
+        return number_of_parameters * np.log(len(self.Dataset)) - 2 * self.__log_likelihood
